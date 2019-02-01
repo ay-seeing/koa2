@@ -1,7 +1,7 @@
 const koa = require('koa')
 const path = require('path')
 const views = require('koa-views')    // html模板引擎中间件
-// const static = require('koa-static')    // 加载静态资源中间件
+const static = require('koa-static')    // 加载静态资源中间件
 const compose = require('koa-compose')    // 中间件合并
 const bodyparser = require('koa-bodyparser')    // 获取post请求参数
 const Router = require('koa-router')     // 路由中间件
@@ -12,9 +12,13 @@ const app = new koa()
 const router = new Router()   // 初始化 koa-router 中间件
 
 
-app.use(views(path.resolve(__dirname), {
+app.use(views(path.resolve(__dirname, 'views'), {    // 加载html模板引擎
     map: {html: 'ejs'}
 }));
+
+app.use(static(   // 加载静态资源
+    path.join(__dirname, 'statics')
+))
 
 
 router.get('/', async (ctx, next)=>{
@@ -22,9 +26,13 @@ router.get('/', async (ctx, next)=>{
     await next()
     ctx.response.status = 200
     ctx.response.type = 'text/html'
-    let a = 56789;
-    // ctx.response.body = ``
-    await ctx.render('t.html', {a,url: ctx.request.url, requestStr: JSON.stringify(ctx.request)})
+    let a = 560;
+    // ctx.response.body = `${a}`
+    await ctx.render('t', {
+        a,
+        url: ctx.request.url, 
+        requestStr: JSON.stringify(ctx.request)
+    })
 })
 
 router.post('/', async (ctx, next)=>{
